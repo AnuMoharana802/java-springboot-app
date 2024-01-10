@@ -17,3 +17,13 @@ pipeline {
         }
     }
 }
+ stage('SonarQube analysis') {
+            environment {
+                scannerHome = tool 'sonar-scanner-potal'
+            }
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
+        }
