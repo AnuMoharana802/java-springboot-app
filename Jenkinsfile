@@ -51,7 +51,7 @@ pipeline {
                     docker.withRegistry("https://projectpotal.jfrog.io", 'jforg-cred') {
                         app.push()
                     }
-                    echo '------------ Docker Publish Ended ---------'
+                    echo '------------ Docker Publish Ended -----------'
                 }
             }
         }
