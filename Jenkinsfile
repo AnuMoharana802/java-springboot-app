@@ -19,20 +19,64 @@ pipeline {
         }
 
         /*
-        Uncomment and configure the following stages as needed:
-
-        stage('SonarQube analysis') {
-            // ...
+        stage("Test Stage"){
+            steps{
+                echo "----------- unit test started ----------"
+                sh 'mvn surefire-report:report'
+                echo "----------- unit test Completed ----------"
+            }
+        }
+        
+        stage('SonarQube Analysis') {
+            environment {
+                scannerHome = tool 'sonar-scanner-meportal'
+            }
+            steps{
+                withSonarQubeEnv('sonar-server-meportal') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
         }
 
-        stage("Quality Gate") {
-            // ...
-        }
-
-        stage("Artifact Publish") {
-            // ...
+        stage("Quality Gate"){
+            steps {
+                script {
+                    timeout(time: 1, unit: 'HOURS') { 
+                        def qg = waitForQualityGate() 
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
+            }
         }
         */
+
+        stage("Artifact Publish") {
+            steps {
+                script {
+                    echo '------------- Artifact Publish Started ------------'
+                    def server = Artifactory.newServer url:"https://projectpotal.jfrog.io/artifactory" ,  credentialsId:"jforg-cred"
+                    def properties = "buildid=${env.BUILD_ID},commitid=${GIT_COMMIT}";
+                    def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "staging/(*)",
+                                "target": "libs-release-local/{1}",
+                                "flat": "false",
+                                "props" : "${properties}",
+                                "exclusions": [ "*.sha1", "*.md5"]
+                            }
+                        ]
+                    }"""
+                    def buildInfo = server.upload(uploadSpec)
+                    buildInfo.env.collect()
+                    server.publishBuildInfo(buildInfo)
+                    echo '------------ Artifact Publish Ended -----------'  
+                }
+            }   
+        }
+
 
         stage("Create Docker Image") {
             steps {
@@ -47,11 +91,11 @@ pipeline {
         stage("Docker Publish") {
             steps {
                 script {
-                    echo '---------- Docker Publish Started ---------'  
-                    docker.withRegistry("https://projectpotal.jfrog.io", 'jforg-cred') {
-                        app.push()
-                    }
-                    echo '------------ Docker Publish Ended -----------'
+                     echo '---------- Docker Publish Started ---------'  
+                     docker.withRegistry("https://projectpotal.jfrog.io", 'jforg-cred') {
+                         app.push()
+                     echo '------------ Docker Publish Ended -----------'
+                     }
                 }
             }
         }
