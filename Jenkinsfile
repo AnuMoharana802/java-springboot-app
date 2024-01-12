@@ -50,7 +50,7 @@ pipeline {
                 }
             }
         }
-        */
+        
 
         stage("Artifact Publish") {
             steps {
@@ -76,7 +76,7 @@ pipeline {
                 }
             }   
         }
-
+        */
 
         stage("Create Docker Image") {
             steps {
