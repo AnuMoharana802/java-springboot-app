@@ -83,7 +83,7 @@ stages {
             steps {
                 script {
                     echo '---------- Docker Publish Started ---------'
-                    docker.withRegistry("https://projectpotal.jfrog.io", 'jforg-cred') {
+                    docker.withRegistry("https://projectpotal.jfrog.io", 'jfrog-cred') {
                         app.push()
                     }
                     echo '------------ Docker Publish Ended ---------'
