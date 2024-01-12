@@ -68,7 +68,7 @@ pipeline {
     }
 }
 */
-         stage(" Create Docker Image ") {
+        stage(" Create Docker Image ") {
             steps {
                 script {
                     echo '-------------- Docker Build Started -------------'
@@ -81,7 +81,7 @@ pipeline {
         stage (" Docker Publish "){
             steps {
                 script {
-                        echo '---------- Docker Publish Started ---------'  
+                        echo '---------- Docker Publish Started --------'  
                         docker.withRegistry("https://projectpotal.jfrog.io", 'jforg-cred'){
                         app.push()
                         echo '------------ Docker Publish Ended ---------'  
@@ -89,7 +89,13 @@ pipeline {
                 }
             }
         }
+
     }
+}
+
+
+
+     
  
 
 
