@@ -68,6 +68,7 @@ pipeline {
     }
 }
 */
+
 stages {
         stage("Create Docker Image") {
             steps {
