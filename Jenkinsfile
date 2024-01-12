@@ -40,6 +40,7 @@ pipeline {
             }
         }
         */
+        /*
         stage("Artifact Publish") {
             steps {
                 script {
@@ -65,7 +66,37 @@ pipeline {
             }
         }
     }
-}   
+}
+*/
+         stage(" Create Docker Image ") {
+            steps {
+                script {
+                    echo '-------------- Docker Build Started -------------'
+                    app = docker.build("projectpotal.jfrog.io/meportal-docker-local/myapp:1.0")
+                    echo '-------------- Docker Build Ended -------------'
+                }
+            }
+        }
+
+        stage (" Docker Publish "){
+            steps {
+                script {
+                        echo '---------- Docker Publish Started --------'  
+                        docker.withRegistry("https://projectpotal.jfrog.io", 'jforg-cred'){
+                        app.push()
+                        echo '------------ Docker Publish Ended ---------'  
+                    }    
+                }
+            }
+        }
+
+    }
+}
+
+
+
+
+  
 
 
  
